@@ -10,3 +10,10 @@ To help you get started, we have prepared a video tutorial. Click on the thumbna
 
 https://github.com/user-attachments/assets/aa425974-5025-4acf-b058-9b403857e0fa
 
+
+## Features
+- **Add and manage family members**
+- **Define relationships between family members**
+- **Visualize the family tree**
+- **Search and filter family members**
+
