@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sulala/data/providers/animal_controller.dart';
-import 'package:sulala/presentaion/home_screen/home_screen.dart';
 import 'package:sulala/presentaion/home_screen/family_tree_screen.dart';
 
 void main() {

@@ -1,11 +1,9 @@
 import 'dart:math';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:graphview/GraphView.dart';
-import 'package:sulala/presentaion/home_screen/components/animal_item.dart';
 import 'package:sulala/data/models/animal_model.dart';
-import 'package:sulala/presentaion/search_screen/search_animal.dart';
+import 'package:sulala/presentaion/home_screen/components/animal_item.dart';
 import 'package:sulala/utils/app_assets.dart';
 import 'package:sulala/utils/enums.dart';
 

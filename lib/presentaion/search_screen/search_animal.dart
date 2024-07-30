@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:sulala/data/providers/animal_controller.dart';
 import 'package:sulala/presentaion/search_screen/components/search_field.dart';
 
 import 'components/search_results.dart';
