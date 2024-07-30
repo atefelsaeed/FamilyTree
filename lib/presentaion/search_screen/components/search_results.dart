@@ -33,7 +33,6 @@ class SearchResults extends StatelessWidget {
               child: InkWell(
                 onTap: () {
                   provider.chooseAnimal(filteredItems[index]);
-
                   callBack();
                   Navigator.of(context).pop();
                 },

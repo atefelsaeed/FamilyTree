@@ -12,26 +12,23 @@ class SearchScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => AnimalController(),
-      child: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 20,
-              ),
-              const Padding(
-                padding: EdgeInsets.all(10.0),
-                child: SearchField(),
-              ),
-              Expanded(
-                child: SearchResults(callBack: () {
-                  callBack();
-                }),
-              ),
-            ],
-          ),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 20,
+            ),
+            const Padding(
+              padding: EdgeInsets.all(10.0),
+              child: SearchField(),
+            ),
+            Expanded(
+              child: SearchResults(callBack: () {
+                callBack();
+              }),
+            ),
+          ],
         ),
       ),
     );

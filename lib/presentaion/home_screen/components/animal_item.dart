@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sulala/data/models/animal_model.dart';
-import 'package:sulala/utils/app_assets.dart';
 import 'package:sulala/utils/enums.dart';
 
 class AnimalItem extends StatelessWidget {
@@ -19,7 +18,7 @@ class AnimalItem extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.all(8),
               color: Colors.grey.shade200,
-              child: Image.asset(AppAssets.defaultAnimal),
+              child: Image.asset(animalModel.image),
             ),
           ),
           const SizedBox(height: 5),
@@ -27,7 +26,7 @@ class AnimalItem extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
-                animalModel.name??'',
+                animalModel.name,
                 style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
@@ -51,10 +50,12 @@ class AnimalItem extends StatelessWidget {
           ),
           const SizedBox(height: 2),
           Text(
-            animalModel.status!.displayText??"",
-            style: const TextStyle(
+            animalModel.status.displayText,
+            style: TextStyle(
               fontSize: 16,
-              color: Colors.green,
+              color: animalModel.status.displayText == 'Dead'
+                  ? Colors.red
+                  : Colors.green,
             ),
           ),
         ],

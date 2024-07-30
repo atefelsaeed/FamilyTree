@@ -32,26 +32,128 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
     gender: AnimalGender.femail,
     children: [],
   );
+  final TransformationController _transformationController =
+      TransformationController();
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _centerRootNode();
+    });
     _buildGraph();
+  }
+
+  void _centerRootNode() {
+    Size size = MediaQuery.of(context).size;
+    _transformationController.value = Matrix4.identity()
+      ..translate(size.width / 2 - 50,
+          size.height / 4 - 50); // Adjust the values to fit your graph
   }
 
   void _buildGraph() {
     graph.nodes.clear();
+    Set<String> visitedNodes = {};
     Node rootNode = Node(_createNodeWidget(root));
     graph.addNode(rootNode);
-    _addChildrenToGraph(root, rootNode);
+    _addChildrenToGraph(root, rootNode, visitedNodes);
   }
 
-  void _addChildrenToGraph(AnimalNode parent, Node parentNode) {
+  void _addChildrenToGraph(
+      AnimalNode parent, Node parentNode, Set<String> visitedNodes) {
+    if (visitedNodes.contains(parent.id)) {
+      return; // Avoid circular reference
+    }
+    visitedNodes.add(parent.id);
+
     for (var child in parent.children) {
       Node childNode = Node(_createNodeWidget(child));
       graph.addEdge(parentNode, childNode);
-      _addChildrenToGraph(child, childNode);
+      _addChildrenToGraph(child, childNode, visitedNodes);
     }
+
+    // Add a placeholder node for adding new children
+    Node addNode = Node(_createAddNodeWidget(parent));
+    graph.addEdge(parentNode, addNode);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Harry\'s Family Tree'),
+        centerTitle: true,
+      ),
+      body: Consumer<AnimalController>(builder: (context, provider, child) {
+        return InteractiveViewer(
+          constrained: false,
+          boundaryMargin: const EdgeInsets.all(50),
+          minScale: 0.01,
+          maxScale: 5.6,
+          transformationController: _transformationController,
+          child: GraphView(
+            graph: graph,
+            algorithm:
+                BuchheimWalkerAlgorithm(builder, CustomEdgeRenderer(builder)),
+            paint: Paint()
+              ..color = Colors.green
+              ..strokeWidth = 1.5
+              ..style = PaintingStyle.stroke,
+            builder: (Node node) {
+              var animalNode = node.key!.value as AnimalNode;
+              return _createNodeWidget(animalNode);
+            },
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _createAddNodeWidget(AnimalNode parent) {
+    return Consumer<AnimalController>(builder: (context, provider, child) {
+      return GestureDetector(
+        onTap: () {
+          provider.updateCurrentAnimalNode(parent);
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => SearchScreen(
+                callBack: () {
+                  AnimalNode newNode = AnimalNode(
+                    id: provider.state.selectedAnimalNode!.id,
+                    name: provider.state.selectedAnimalNode!.name,
+                    status: provider.state.selectedAnimalNode!.status,
+                    gender: provider.state.selectedAnimalNode!.gender,
+                    children: provider.state.selectedAnimalNode?.children ?? [],
+                    image: provider.state.selectedAnimalNode!.image,
+                  );
+
+                  debugPrint(
+                      "newNode : ${provider.state.selectedAnimalNode!.name}");
+
+                  parent.children.add(newNode);
+                  _buildGraph();
+                },
+              ),
+            ),
+          );
+        },
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.grey.shade200,
+            shape: BoxShape.circle,
+            // border: Border.all(color: Colors.green, width: 2),
+          ),
+          child: const Icon(
+            Icons.add,
+            color: Colors.black,
+            size: 35,
+          ),
+        ),
+      );
+    });
   }
 
   Widget _createNodeWidget(AnimalNode node) {
@@ -59,86 +161,32 @@ class _FamilyTreeScreenState extends State<FamilyTreeScreen> {
       return GestureDetector(
         onTap: () {
           provider.updateCurrentAnimalNode(node);
-
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => SearchScreen(
                 callBack: () {
-                  node.children.add(provider.state.selectedAnimalNode!);
+                  AnimalNode newNode = AnimalNode(
+                      id: provider.state.selectedAnimalNode!.id,
+                      name: provider.state.selectedAnimalNode!.name,
+                      status: provider.state.selectedAnimalNode!.status,
+                      gender: provider.state.selectedAnimalNode!.gender,
+                      children:
+                          provider.state.selectedAnimalNode?.children ?? [],
+                      image: provider.state.selectedAnimalNode!.image);
+
+                  debugPrint(
+                      "newNode : ${provider.state.selectedAnimalNode!.name}");
+
+                  node.children.add(newNode);
                   _buildGraph();
                 },
               ),
             ),
           );
         },
-        child: AnimalItem(animalModel: node),
+        child: AnimalItem(animalModel: node, key: ValueKey(node.id)),
       );
     });
-  }
-
-  void _addNewNode(AnimalNode parentNode) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Add New Animal'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                setState(() {
-                  // AnimalNode newNode = AnimalNode(
-                  //     id: idController.text,
-                  //     name: nameController.text,
-                  //     status: AnimalStatus.dead,
-                  //     gender: AnimalGender.femail,
-                  //     children: [],
-                  //     image: AppAssets.defaultAnimal2);
-
-                  // Rebuild the graph with the new node
-                });
-                Navigator.of(context).pop();
-              },
-              child: const Text('Add'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Family Tree'),
-      ),
-      body: InteractiveViewer(
-        constrained: false,
-        boundaryMargin: const EdgeInsets.all(30),
-        minScale: 0.01,
-        maxScale: 5.6,
-        child: GraphView(
-          graph: graph,
-          algorithm:
-              BuchheimWalkerAlgorithm(builder, CustomEdgeRenderer(builder)),
-          paint: Paint()
-            ..color = Colors.green
-            ..strokeWidth = 1.5
-            ..style = PaintingStyle.stroke,
-          builder: (Node node) {
-            var animalNode = node.key!.value as AnimalNode;
-            return _createNodeWidget(animalNode);
-          },
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _addNewNode(
-              root); // Assume root node is where we add new children; adjust as needed
-        },
-        child: const Icon(Icons.add),
-      ),
-    );
   }
 }

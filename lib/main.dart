@@ -18,12 +18,13 @@ class MyApp extends StatelessWidget {
         return AnimalController();
       },
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'Family Tree Demo',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
           useMaterial3: true,
         ),
-        home:  FamilyTreeScreen(),
+        home:  const FamilyTreeScreen(),
       ),
     );
   }
